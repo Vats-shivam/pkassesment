@@ -1,11 +1,12 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import axios from "axios";
+import { error } from "console";
 interface FormData {
-  name?: string
-  email?: string
-  phone?: string
-  message?: string
+  name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
 }
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function Home() {
     phone: "",
     message: "",
   });
-  const [mounted, setmounted] = useState(false)
+  const [mounted, setmounted] = useState(false);
   const [errors, setErrors] = useState({});
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -48,19 +49,21 @@ export default function Home() {
 
     const newErrors = validate(formData);
     console.log(newErrors);
-    setErrors(newErrors); // Update errors before checking
-    axios.post(
-      "https://script.google.com/macros/s/AKfycbyO-vxZnbcQ4oLvN_xdrPON41cNpH0Tl6rWeicKgZhsUHU8k-_HAcXRIL3OYAaSayEfzA/exec",formData)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    setErrors(newErrors);
+    fetch("https://api.apispreadsheets.com/data/bxhziJwPPy63wDYh/", {
+      method: "POST",
+      body: JSON.stringify({
+        data: { name: formData.name, email: formData.email, phone: formData.phone, message: formData.message },
+      }),
+    }).then((res) => {
+      if (res.status === 201) {
+        console.log(res);}
+    })
+    .catch((error)=>{
+      console.log(error)
+    });
 
     if (Object.keys(newErrors).length === 0) {
-
       // Perform form submission logic here (e.g., send data to server)
       // console.log("Form submitted:", formData);
       setFormData({ name: "", email: "", phone: "", message: "" });
@@ -70,9 +73,9 @@ export default function Home() {
     // }
   };
   React.useEffect(() => {
-    setmounted(true)
+    setmounted(true);
     console.log("heellloooo");
-  }, [])
+  }, []);
   return (
     <main className="p-8 rounded-md shadow-md w-1/2">
       {/* <Toaster/> */}
@@ -141,7 +144,9 @@ export default function Home() {
             rows={5}
             className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, message: e.target.value })
+            }
             required
           ></textarea>
         </div>
